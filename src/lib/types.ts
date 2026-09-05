@@ -87,5 +87,4 @@ export interface Settings {
 export interface Db {
   settings: Settings;
   categories: MenuCategory[];
-  items: MenuItem[];
 }

@@ -1,7 +1,8 @@
 /**
- * One-time / re-runnable script that writes the sample menu and settings
- * into the real Firestore project (no sample orders — those are seeded
- * only through the real ordering flow now). Run with:
+ * One-time / re-runnable script that writes default settings and the menu
+ * categories into the real Firestore project. Does not write menu items or
+ * orders — both are real content now, entered through the app itself, and
+ * re-seeding must never silently reintroduce placeholder ones. Run with:
  *   node --env-file=.env.local -r tsx/cjs scripts/seed-firestore.ts
  */
 import { cert, initializeApp } from "firebase-admin/app";
@@ -20,7 +21,7 @@ const app = initializeApp({
 const adminDb = getFirestore(app);
 
 async function main() {
-  const { settings, categories, items } = seedDb();
+  const { settings, categories } = seedDb();
 
   await adminDb.collection("settings").doc("global").set(settings);
   console.log("wrote settings");
@@ -30,12 +31,6 @@ async function main() {
     await adminDb.collection("menuCategories").doc(id).set(data);
   }
   console.log(`wrote ${categories.length} menu categories`);
-
-  for (const item of items) {
-    const { id, ...data } = item;
-    await adminDb.collection("menuItems").doc(id).set(data);
-  }
-  console.log(`wrote ${items.length} menu items`);
 
   console.log("done");
   process.exit(0);

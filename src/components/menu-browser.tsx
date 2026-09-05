@@ -37,6 +37,12 @@ export function MenuBrowser({ categories, items }: { categories: MenuCategory[];
           ))}
         </div>
 
+        {visible.length === 0 && (
+          <p className="px-4 py-16 text-center text-[13.5px] text-ink-faint md:px-0">
+            Nothing in this category yet — check back soon.
+          </p>
+        )}
+
         <div className="grid grid-cols-1 gap-3 p-4 pb-28 sm:grid-cols-2 md:p-0 md:pt-6 md:pb-4 lg:grid-cols-3">
           {visible.map((item) => {
             const qty = qtyFor(item.id);

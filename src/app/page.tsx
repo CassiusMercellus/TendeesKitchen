@@ -1,16 +1,24 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { MenuPhoto } from "@/components/menu-photo";
-import { getSettings, getAvailableMenuItems } from "@/lib/store";
+import { getSettings, getAvailableMenuItems, getCategories } from "@/lib/store";
 import { formatMoney } from "@/lib/format";
 import { UNIT_LABEL } from "@/lib/types";
 
-const HIGHLIGHT_IDS = ["jollof", "egusi", "suya", "puff-puff"];
+const MAX_HIGHLIGHTS = 4;
 
 export default async function LandingPage() {
   const settings = await getSettings();
   const items = await getAvailableMenuItems();
-  const highlights = HIGHLIGHT_IDS.map((id) => items.find((i) => i.id === id)).filter((i): i is NonNullable<typeof i> => Boolean(i));
+  const categories = await getCategories();
+
+  // One item per category (in menu order) so the highlights show variety
+  // across the menu rather than four items from a single category.
+  const highlights = categories
+    .map((cat) => items.find((i) => i.categoryId === cat.id))
+    .filter((i): i is NonNullable<typeof i> => Boolean(i))
+    .slice(0, MAX_HIGHLIGHTS);
+
   const phoneDigits = settings.businessPhone.replace(/[^\d+]/g, "");
 
   return (
@@ -73,34 +81,36 @@ export default async function LandingPage() {
       </section>
 
       {/* Menu highlights */}
-      <section className="bg-surface-2/60 px-5 py-16 md:py-24">
-        <div className="mx-auto max-w-5xl">
-          <div className="flex items-end justify-between">
-            <h2 className="text-2xl font-semibold md:text-[2rem]">A taste of the menu</h2>
-            <Link href="/menu" className="hidden text-[13.5px] font-semibold text-indigo underline sm:block">
+      {highlights.length > 0 && (
+        <section className="bg-surface-2/60 px-5 py-16 md:py-24">
+          <div className="mx-auto max-w-5xl">
+            <div className="flex items-end justify-between">
+              <h2 className="text-2xl font-semibold md:text-[2rem]">A taste of the menu</h2>
+              <Link href="/menu" className="hidden text-[13.5px] font-semibold text-indigo underline sm:block">
+                See full menu →
+              </Link>
+            </div>
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {highlights.map((item) => (
+                <div key={item.id} className="rounded-xl border border-line bg-surface p-4">
+                  <div className="mb-3 h-28 w-full overflow-hidden rounded-lg">
+                    <MenuPhoto src={item.photoUrl} alt={item.name} />
+                  </div>
+                  <h3 className="text-[15px] font-semibold">{item.name}</h3>
+                  <p className="mt-1 text-[12.5px] leading-snug text-ink-soft">{item.description}</p>
+                  <div className="mt-2 flex items-baseline justify-between">
+                    <span className="text-[13px] font-semibold">{formatMoney(item.price)}</span>
+                    <span className="font-mono text-[11px] text-ink-faint">{UNIT_LABEL[item.unit]}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Link href="/menu" className="mt-6 block text-center text-[13.5px] font-semibold text-indigo underline sm:hidden">
               See full menu →
             </Link>
           </div>
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {highlights.map((item) => (
-              <div key={item.id} className="rounded-xl border border-line bg-surface p-4">
-                <div className="mb-3 h-28 w-full overflow-hidden rounded-lg">
-                  <MenuPhoto src={item.photoUrl} alt={item.name} />
-                </div>
-                <h3 className="text-[15px] font-semibold">{item.name}</h3>
-                <p className="mt-1 text-[12.5px] leading-snug text-ink-soft">{item.description}</p>
-                <div className="mt-2 flex items-baseline justify-between">
-                  <span className="text-[13px] font-semibold">{formatMoney(item.price)}</span>
-                  <span className="font-mono text-[11px] text-ink-faint">{UNIT_LABEL[item.unit]}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <Link href="/menu" className="mt-6 block text-center text-[13.5px] font-semibold text-indigo underline sm:hidden">
-            See full menu →
-          </Link>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Large events */}
       <section className="mx-auto max-w-3xl px-5 py-16 text-center md:py-20">
