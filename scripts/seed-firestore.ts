@@ -1,6 +1,7 @@
 /**
- * One-time / re-runnable script that writes the sample menu, orders, and
- * settings into the real Firestore project. Run with:
+ * One-time / re-runnable script that writes the sample menu and settings
+ * into the real Firestore project (no sample orders — those are seeded
+ * only through the real ordering flow now). Run with:
  *   node --env-file=.env.local -r tsx/cjs scripts/seed-firestore.ts
  */
 import { cert, initializeApp } from "firebase-admin/app";
@@ -19,7 +20,7 @@ const app = initializeApp({
 const adminDb = getFirestore(app);
 
 async function main() {
-  const { settings, categories, items, orders } = seedDb();
+  const { settings, categories, items } = seedDb();
 
   await adminDb.collection("settings").doc("global").set(settings);
   console.log("wrote settings");
@@ -35,12 +36,6 @@ async function main() {
     await adminDb.collection("menuItems").doc(id).set(data);
   }
   console.log(`wrote ${items.length} menu items`);
-
-  for (const order of orders) {
-    const { id, ...data } = order;
-    await adminDb.collection("orders").doc(id).set(data);
-  }
-  console.log(`wrote ${orders.length} sample orders`);
 
   console.log("done");
   process.exit(0);

@@ -80,6 +80,7 @@ export interface Settings {
   businessName: string;
   venmoHandle: string;
   businessPhone: string;
+  notificationEmail: string;
   guestThreshold: number;
 }
 
@@ -87,5 +88,4 @@ export interface Db {
   settings: Settings;
   categories: MenuCategory[];
   items: MenuItem[];
-  orders: Order[];
 }

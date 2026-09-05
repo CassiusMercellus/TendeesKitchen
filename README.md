@@ -20,7 +20,7 @@ This app runs on a real Firebase project (Firestore + Auth):
 2. Project settings → **Service accounts** → Generate new private key. Save the downloaded file as `web/firebase-service-account.json` (gitignored, never commit it).
 3. Project settings → **General** → Your apps → add a web app, and copy its config values.
 4. Fill in `.env.local` (copied from `.env.local.example`): the three `FIREBASE_*` vars come from the service account JSON, the `NEXT_PUBLIC_FIREBASE_*` vars from the web app config.
-5. Populate the database with the sample menu/orders: `npm run seed`.
+5. Populate the database with the sample menu and settings: `npm run seed`.
 
 Firebase Storage is intentionally **not** used (new Storage buckets now require the paid Blaze plan) — see "What's real vs. placeholder" below for the photo-upload workaround.
 
@@ -29,10 +29,14 @@ Firebase Storage is intentionally **not** used (new Storage buckets now require 
 This is a fully working app on a real backend — Firestore for data, Firebase Auth gating `/admin` — but a couple of things are still placeholder:
 
 - **Menu photos**: the "Add item" form takes a photo *URL* rather than a real upload (avoids requiring Firebase Storage's Blaze/billing plan). The owner hosts a photo elsewhere (Imgur, etc.) and pastes the direct link in.
-- **Notifications**: no email or SMS actually sends yet — a new order only shows up in the admin dashboard.
+- **Notifications**: no email or SMS actually sends yet — a new order only shows up in the admin dashboard. `/admin/settings` has a notification-email field ready for when this is wired up.
 - **Payment**: intentionally placeholder-free — v1 always says "we'll send a Venmo request," matching how the business runs today.
 
-If you ever want to reset back to the sample data, re-run `npm run seed` — it overwrites the seeded documents (real orders placed since then aren't touched unless they share a seed doc ID).
+**Admin panel now also has:**
+- `/admin/settings` — edit the business name, phone, notification email, Venmo handle, and guest threshold without touching code.
+- A **Back** button next to Advance on each order's kitchen-status pipeline, for undoing an accidental status change.
+
+There are no sample orders seeded anymore (removed once the real database was live) — `npm run seed` only (re)writes the menu and settings, never touches `orders`.
 
 ## Where things live
 

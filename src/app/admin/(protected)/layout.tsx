@@ -48,6 +48,9 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
           <Link href="/admin/menu" className="border-b-2 border-transparent pb-2 text-white/90 hover:border-white/40">
             Menu
           </Link>
+          <Link href="/admin/settings" className="border-b-2 border-transparent pb-2 text-white/90 hover:border-white/40">
+            Settings
+          </Link>
         </nav>
       </div>
       {children}

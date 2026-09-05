@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getOrder } from "@/lib/store";
-import { advanceOrderStatusAction } from "@/lib/actions";
+import { advanceOrderStatusAction, revertOrderStatusAction } from "@/lib/actions";
 import { formatEventDate, formatMoney } from "@/lib/format";
 import { STAGES, UNIT_LABEL } from "@/lib/types";
 
@@ -11,8 +11,10 @@ export default async function AdminOrderDetailPage(props: PageProps<"/admin/orde
   if (!order) notFound();
 
   const currentIndex = STAGES.findIndex((s) => s.key === order.status);
+  const atStart = currentIndex <= 0;
   const atEnd = currentIndex >= STAGES.length - 1;
   const advanceThisOrder = advanceOrderStatusAction.bind(null, order.id);
+  const revertThisOrder = revertOrderStatusAction.bind(null, order.id);
   const total = order.items.reduce((sum, i) => sum + i.qty * i.price, 0);
 
   return (
@@ -114,17 +116,34 @@ export default async function AdminOrderDetailPage(props: PageProps<"/admin/orde
       </section>
 
       <section className="px-5 pt-5 pb-9 lg:px-0">
-        <form action={advanceThisOrder}>
-          <button
-            type="submit"
-            disabled={atEnd}
-            className={`w-full rounded-xl py-4 text-[14.5px] font-semibold ${
-              atEnd ? "bg-good-tint text-good" : "bg-indigo text-white"
-            }`}
-          >
-            {atEnd ? "Order completed" : `Advance to ${STAGES[currentIndex + 1].label}`}
-          </button>
-        </form>
+        <div className="flex gap-2.5">
+          <form action={revertThisOrder} className="flex-none">
+            <button
+              type="submit"
+              disabled={atStart}
+              title={atStart ? undefined : `Back to ${STAGES[currentIndex - 1].label}`}
+              className="flex h-[52px] items-center justify-center rounded-xl border border-line-strong bg-surface px-5 text-[14.5px] font-semibold text-ink-soft disabled:opacity-40"
+            >
+              Back
+            </button>
+          </form>
+          <form action={advanceThisOrder} className="flex-1">
+            <button
+              type="submit"
+              disabled={atEnd}
+              className={`w-full rounded-xl py-4 text-[14.5px] font-semibold ${
+                atEnd ? "bg-good-tint text-good" : "bg-indigo text-white"
+              }`}
+            >
+              {atEnd ? "Order completed" : `Advance to ${STAGES[currentIndex + 1].label}`}
+            </button>
+          </form>
+        </div>
+        {!atStart && !atEnd && (
+          <p className="mt-2 text-center text-[11px] text-ink-faint">
+            Moved something by accident? Back returns it to {STAGES[currentIndex - 1].label}.
+          </p>
+        )}
       </section>
       </div>
       </div>

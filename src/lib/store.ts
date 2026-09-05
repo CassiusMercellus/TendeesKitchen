@@ -23,6 +23,10 @@ export async function getSettings(): Promise<Settings> {
   return snap.data() as Settings;
 }
 
+export async function updateSettings(update: Settings): Promise<void> {
+  await adminDb.collection("settings").doc(SETTINGS_DOC_ID).set(update);
+}
+
 // ---- menu ----
 
 export async function getCategories(): Promise<MenuCategory[]> {
@@ -124,19 +128,28 @@ export async function createOrder(input: {
   return { id: ref.id, ...data };
 }
 
-export async function advanceOrderStatus(id: string): Promise<Order | undefined> {
+async function moveOrderStatus(id: string, step: 1 | -1): Promise<Order | undefined> {
   const ref = adminDb.collection("orders").doc(id);
   const snap = await ref.get();
   if (!snap.exists) return undefined;
   const order = { id: snap.id, ...snap.data() } as Order;
 
   const currentIndex = STAGES.findIndex((s) => s.key === order.status);
-  if (currentIndex === -1 || currentIndex >= STAGES.length - 1) return order;
+  const targetIndex = currentIndex + step;
+  if (currentIndex === -1 || targetIndex < 0 || targetIndex >= STAGES.length) return order;
 
-  const nextStatus: OrderStatus = STAGES[currentIndex + 1].key;
+  const nextStatus: OrderStatus = STAGES[targetIndex].key;
   const changedAt = new Date().toISOString();
   const statusHistory = [...order.statusHistory, { status: nextStatus, changedAt }];
 
   await ref.update({ status: nextStatus, statusHistory });
   return { ...order, status: nextStatus, statusHistory };
+}
+
+export function advanceOrderStatus(id: string) {
+  return moveOrderStatus(id, 1);
+}
+
+export function revertOrderStatus(id: string) {
+  return moveOrderStatus(id, -1);
 }

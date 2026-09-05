@@ -46,6 +46,12 @@ export async function advanceOrderStatusAction(orderId: string) {
   revalidatePath("/admin/orders");
 }
 
+export async function revertOrderStatusAction(orderId: string) {
+  await store.revertOrderStatus(orderId);
+  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath("/admin/orders");
+}
+
 export async function toggleMenuItemAvailabilityAction(itemId: string) {
   await store.toggleMenuItemAvailability(itemId);
   revalidatePath("/admin/menu");
@@ -67,4 +73,26 @@ export async function addMenuItemAction(formData: FormData) {
   await store.addMenuItem({ categoryId, name, description, price, unit, photoUrl });
   revalidatePath("/admin/menu");
   revalidatePath("/");
+}
+
+export async function updateSettingsAction(formData: FormData) {
+  const businessName = String(formData.get("businessName") ?? "").trim();
+  const businessPhone = String(formData.get("businessPhone") ?? "").trim();
+  const notificationEmail = String(formData.get("notificationEmail") ?? "").trim();
+  const venmoHandle = String(formData.get("venmoHandle") ?? "").trim();
+  const guestThreshold = Number(formData.get("guestThreshold"));
+
+  if (!businessName || !businessPhone) {
+    throw new Error("Business name and phone are required.");
+  }
+  if (!Number.isFinite(guestThreshold) || guestThreshold < 1) {
+    throw new Error("Guest threshold must be a positive number.");
+  }
+
+  await store.updateSettings({ businessName, businessPhone, notificationEmail, venmoHandle, guestThreshold });
+
+  revalidatePath("/admin/settings");
+  revalidatePath("/");
+  revalidatePath("/menu");
+  revalidatePath("/order");
 }
