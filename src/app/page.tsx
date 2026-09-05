@@ -1,19 +1,11 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { MenuPhoto } from "@/components/menu-photo";
 import { getSettings, getAvailableMenuItems } from "@/lib/store";
 import { formatMoney } from "@/lib/format";
 import { UNIT_LABEL } from "@/lib/types";
 
 const HIGHLIGHT_IDS = ["jollof", "egusi", "suya", "puff-puff"];
-
-function UtensilsIcon() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 2v20M6 2c-1.5 0-2.5 1-2.5 2.5S4.5 7 6 7s2.5-1 2.5-2.5S7.5 2 6 2z" />
-      <path d="M18 2c-2 0-3 2-3 5s1 6 3 6 3-3 3-6-1-5-3-5zM18 13v9" />
-    </svg>
-  );
-}
 
 export default async function LandingPage() {
   const settings = await getSettings();
@@ -92,8 +84,8 @@ export default async function LandingPage() {
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {highlights.map((item) => (
               <div key={item.id} className="rounded-xl border border-line bg-surface p-4">
-                <div className="mb-3 flex h-28 w-full items-center justify-center rounded-lg bg-gradient-to-br from-gold-tint to-indigo-tint text-indigo/55">
-                  <UtensilsIcon />
+                <div className="mb-3 h-28 w-full overflow-hidden rounded-lg">
+                  <MenuPhoto src={item.photoUrl} alt={item.name} />
                 </div>
                 <h3 className="text-[15px] font-semibold">{item.name}</h3>
                 <p className="mt-1 text-[12.5px] leading-snug text-ink-soft">{item.description}</p>

@@ -3,18 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/cart-provider";
+import { MenuPhoto } from "@/components/menu-photo";
 import { formatMoney } from "@/lib/format";
 import { UNIT_LABEL } from "@/lib/types";
 import type { MenuCategory, MenuItem } from "@/lib/types";
-
-function UtensilsIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 2v20M6 2c-1.5 0-2.5 1-2.5 2.5S4.5 7 6 7s2.5-1 2.5-2.5S7.5 2 6 2z" />
-      <path d="M18 2c-2 0-3 2-3 5s1 6 3 6 3-3 3-6-1-5-3-5zM18 13v9" />
-    </svg>
-  );
-}
 
 export function MenuBrowser({ categories, items }: { categories: MenuCategory[]; items: MenuItem[] }) {
   const [active, setActive] = useState(categories[0]?.id ?? "");
@@ -50,8 +42,8 @@ export function MenuBrowser({ categories, items }: { categories: MenuCategory[];
             const qty = qtyFor(item.id);
             return (
               <div key={item.id} className="flex gap-3 rounded-xl border border-line bg-surface p-3">
-                <div className="flex h-16 w-16 flex-none items-center justify-center rounded-lg bg-gradient-to-br from-gold-tint to-indigo-tint text-indigo/55">
-                  <UtensilsIcon />
+                <div className="h-16 w-16 flex-none overflow-hidden rounded-lg">
+                  <MenuPhoto src={item.photoUrl} alt={item.name} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-[15px] font-semibold">{item.name}</h3>
