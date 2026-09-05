@@ -16,8 +16,10 @@ export type OrderStatus =
   | "prepping"
   | "ready"
   | "out"
-  | "completed";
+  | "completed"
+  | "cancelled";
 
+/** The linear kitchen pipeline. "cancelled" is a side-branch, not a stage in this sequence — it's reached by cancelling from any stage, not by advancing. */
 export const STAGES: { key: OrderStatus; label: string; description: string }[] = [
   { key: "requested", label: "Requested", description: "New order in, awaiting review" },
   { key: "shopping", label: "Shopping", description: "Ingredients being gathered" },
@@ -70,6 +72,8 @@ export interface Order {
   items: OrderLineItem[];
   notes?: string;
   status: OrderStatus;
+  /** The stage this order was at right before being cancelled — lets "reinstate" put it back where it left off. */
+  previousStatus?: OrderStatus;
   /** Reserved for the online-payment phase; v1 is always Venmo, arranged after confirmation. */
   paymentStatus: "arranged_via_venmo";
   createdAt: string;

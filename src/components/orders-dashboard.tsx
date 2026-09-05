@@ -10,6 +10,7 @@ import { STAGES } from "@/lib/types";
 const FILTERS: { key: OrderStatus | "all"; label: string }[] = [
   { key: "all", label: "All" },
   ...STAGES.map((s) => ({ key: s.key, label: s.label })),
+  { key: "cancelled", label: "Cancelled" },
 ];
 
 export function OrdersDashboard({ orders }: { orders: Order[] }) {
@@ -35,7 +36,7 @@ export function OrdersDashboard({ orders }: { orders: Order[] }) {
       <div className="grid grid-cols-1 gap-2.5 p-4 pb-10 md:grid-cols-2 md:p-8 xl:grid-cols-3">
         {visible.length === 0 && <p className="py-8 text-center text-sm text-ink-faint md:col-span-full">No orders in this view.</p>}
         {visible.map((order) => {
-          const urgent = order.status !== "completed" && isDueSoon(order.eventDate);
+          const urgent = order.status !== "completed" && order.status !== "cancelled" && isDueSoon(order.eventDate);
           return (
             <Link
               key={order.id}

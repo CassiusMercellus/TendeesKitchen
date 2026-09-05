@@ -1,7 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getOrder } from "@/lib/store";
-import { advanceOrderStatusAction, revertOrderStatusAction } from "@/lib/actions";
+import {
+  advanceOrderStatusAction,
+  revertOrderStatusAction,
+  cancelOrderAction,
+  reinstateOrderAction,
+  deleteOrderAction,
+} from "@/lib/actions";
+import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { formatEventDate, formatMoney } from "@/lib/format";
 import { STAGES, UNIT_LABEL } from "@/lib/types";
 
@@ -10,11 +17,16 @@ export default async function AdminOrderDetailPage(props: PageProps<"/admin/orde
   const order = await getOrder(id);
   if (!order) notFound();
 
+  const isCancelled = order.status === "cancelled";
   const currentIndex = STAGES.findIndex((s) => s.key === order.status);
   const atStart = currentIndex <= 0;
   const atEnd = currentIndex >= STAGES.length - 1;
   const advanceThisOrder = advanceOrderStatusAction.bind(null, order.id);
   const revertThisOrder = revertOrderStatusAction.bind(null, order.id);
+  const cancelThisOrder = cancelOrderAction.bind(null, order.id);
+  const reinstateThisOrder = reinstateOrderAction.bind(null, order.id);
+  const deleteThisOrder = deleteOrderAction.bind(null, order.id);
+  const previousStageLabel = STAGES.find((s) => s.key === order.previousStatus)?.label;
   const total = order.items.reduce((sum, i) => sum + i.qty * i.price, 0);
 
   return (
@@ -79,72 +91,121 @@ export default async function AdminOrderDetailPage(props: PageProps<"/admin/orde
       <div>
       <section className="px-5 pt-4 lg:px-0">
         <SectionLabel>Kitchen status</SectionLabel>
-        <div className="rounded-xl border border-line bg-surface p-4 pl-5">
-          {STAGES.map((stage, i) => {
-            const done = i < currentIndex;
-            const current = i === currentIndex;
-            return (
-              <div key={stage.key} className="relative flex gap-3.5 pb-5 last:pb-0">
-                {i < STAGES.length - 1 && (
-                  <div className="absolute top-[22px] left-[10px] h-full w-0.5 bg-line-strong" />
-                )}
-                <div
-                  className={`z-10 flex h-[22px] w-[22px] flex-none items-center justify-center rounded-full border-2 ${
-                    done
-                      ? "border-good bg-good"
-                      : current
-                        ? "border-indigo bg-indigo"
-                        : "border-line-strong bg-surface"
-                  }`}
-                >
-                  {done && (
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20 6L9 17l-5-5" />
-                    </svg>
-                  )}
-                </div>
-                <div>
-                  <h3 className={`text-[14px] font-semibold ${i <= currentIndex ? "text-ink" : "text-ink-faint"}`}>
-                    {stage.label}
-                  </h3>
-                  <p className="mt-0.5 text-xs text-ink-faint">{stage.description}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
 
-      <section className="px-5 pt-5 pb-9 lg:px-0">
-        <div className="flex gap-2.5">
-          <form action={revertThisOrder} className="flex-none">
-            <button
-              type="submit"
-              disabled={atStart}
-              title={atStart ? undefined : `Back to ${STAGES[currentIndex - 1].label}`}
-              className="flex h-[52px] items-center justify-center rounded-xl border border-line-strong bg-surface px-5 text-[14.5px] font-semibold text-ink-soft disabled:opacity-40"
-            >
-              Back
-            </button>
-          </form>
-          <form action={advanceThisOrder} className="flex-1">
-            <button
-              type="submit"
-              disabled={atEnd}
-              className={`w-full rounded-xl py-4 text-[14.5px] font-semibold ${
-                atEnd ? "bg-good-tint text-good" : "bg-indigo text-white"
-              }`}
-            >
-              {atEnd ? "Order completed" : `Advance to ${STAGES[currentIndex + 1].label}`}
-            </button>
-          </form>
-        </div>
-        {!atStart && !atEnd && (
-          <p className="mt-2 text-center text-[11px] text-ink-faint">
-            Moved something by accident? Back returns it to {STAGES[currentIndex - 1].label}.
-          </p>
+        {isCancelled ? (
+          <div className="rounded-xl border border-line-strong bg-surface p-6 text-center">
+            <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-line">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#565b6b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="m4.9 4.9 14.2 14.2" />
+              </svg>
+            </div>
+            <h3 className="text-[15px] font-semibold">This order was cancelled</h3>
+            {previousStageLabel && (
+              <p className="mt-1 text-[13px] text-ink-faint">It was at {previousStageLabel} beforehand.</p>
+            )}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-line bg-surface p-4 pl-5">
+            {STAGES.map((stage, i) => {
+              const done = i < currentIndex;
+              const current = i === currentIndex;
+              return (
+                <div key={stage.key} className="relative flex gap-3.5 pb-5 last:pb-0">
+                  {i < STAGES.length - 1 && (
+                    <div className="absolute top-[22px] left-[10px] h-full w-0.5 bg-line-strong" />
+                  )}
+                  <div
+                    className={`z-10 flex h-[22px] w-[22px] flex-none items-center justify-center rounded-full border-2 ${
+                      done
+                        ? "border-good bg-good"
+                        : current
+                          ? "border-indigo bg-indigo"
+                          : "border-line-strong bg-surface"
+                    }`}
+                  >
+                    {done && (
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className={`text-[14px] font-semibold ${i <= currentIndex ? "text-ink" : "text-ink-faint"}`}>
+                      {stage.label}
+                    </h3>
+                    <p className="mt-0.5 text-xs text-ink-faint">{stage.description}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </section>
+
+      {isCancelled ? (
+        <section className="px-5 pt-5 pb-9 lg:px-0">
+          <form action={reinstateThisOrder}>
+            <button type="submit" className="w-full rounded-xl bg-indigo py-4 text-[14.5px] font-semibold text-white">
+              Reinstate order
+            </button>
+          </form>
+          <p className="mt-2 text-center text-[11px] text-ink-faint">
+            Puts it back at {previousStageLabel ?? "Requested"}.
+          </p>
+
+          <div className="mt-6 border-t border-line pt-5 text-center">
+            <ConfirmSubmitButton
+              action={deleteThisOrder}
+              confirmMessage="Permanently delete this order? This can't be undone."
+              className="text-[13px] font-semibold text-pepper underline"
+            >
+              Delete permanently
+            </ConfirmSubmitButton>
+          </div>
+        </section>
+      ) : (
+        <section className="px-5 pt-5 pb-9 lg:px-0">
+          <div className="flex gap-2.5">
+            <form action={revertThisOrder} className="flex-none">
+              <button
+                type="submit"
+                disabled={atStart}
+                title={atStart ? undefined : `Back to ${STAGES[currentIndex - 1].label}`}
+                className="flex h-[52px] items-center justify-center rounded-xl border border-line-strong bg-surface px-5 text-[14.5px] font-semibold text-ink-soft disabled:opacity-40"
+              >
+                Back
+              </button>
+            </form>
+            <form action={advanceThisOrder} className="flex-1">
+              <button
+                type="submit"
+                disabled={atEnd}
+                className={`w-full rounded-xl py-4 text-[14.5px] font-semibold ${
+                  atEnd ? "bg-good-tint text-good" : "bg-indigo text-white"
+                }`}
+              >
+                {atEnd ? "Order completed" : `Advance to ${STAGES[currentIndex + 1].label}`}
+              </button>
+            </form>
+          </div>
+          {!atStart && !atEnd && (
+            <p className="mt-2 text-center text-[11px] text-ink-faint">
+              Moved something by accident? Back returns it to {STAGES[currentIndex - 1].label}.
+            </p>
+          )}
+
+          <div className="mt-6 text-center">
+            <ConfirmSubmitButton
+              action={cancelThisOrder}
+              confirmMessage="Cancel this order? You can reinstate it later from the Cancelled filter."
+              className="text-[13px] font-semibold text-pepper underline"
+            >
+              Cancel this order
+            </ConfirmSubmitButton>
+          </div>
+        </section>
+      )}
       </div>
       </div>
     </div>

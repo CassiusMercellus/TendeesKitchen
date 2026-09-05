@@ -80,12 +80,12 @@ export async function getOrders(): Promise<Order[]> {
   const snap = await adminDb.collection("orders").get();
   const orders = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Order);
   const active = orders
-    .filter((o) => o.status !== "completed")
+    .filter((o) => o.status !== "completed" && o.status !== "cancelled")
     .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
-  const completed = orders
-    .filter((o) => o.status === "completed")
+  const archived = orders
+    .filter((o) => o.status === "completed" || o.status === "cancelled")
     .sort((a, b) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime());
-  return [...active, ...completed];
+  return [...active, ...archived];
 }
 
 export async function getOrder(id: string): Promise<Order | undefined> {
@@ -152,4 +152,45 @@ export function advanceOrderStatus(id: string) {
 
 export function revertOrderStatus(id: string) {
   return moveOrderStatus(id, -1);
+}
+
+export async function cancelOrder(id: string): Promise<Order | undefined> {
+  const ref = adminDb.collection("orders").doc(id);
+  const snap = await ref.get();
+  if (!snap.exists) return undefined;
+  const order = { id: snap.id, ...snap.data() } as Order;
+  if (order.status === "cancelled") return order;
+
+  const changedAt = new Date().toISOString();
+  const statusHistory = [...order.statusHistory, { status: "cancelled" as const, changedAt }];
+
+  await ref.update({ status: "cancelled", previousStatus: order.status, statusHistory });
+  return { ...order, status: "cancelled", previousStatus: order.status, statusHistory };
+}
+
+export async function reinstateOrder(id: string): Promise<Order | undefined> {
+  const ref = adminDb.collection("orders").doc(id);
+  const snap = await ref.get();
+  if (!snap.exists) return undefined;
+  const order = { id: snap.id, ...snap.data() } as Order;
+  if (order.status !== "cancelled") return order;
+
+  const restoredStatus: OrderStatus = order.previousStatus ?? "requested";
+  const changedAt = new Date().toISOString();
+  const statusHistory = [...order.statusHistory, { status: restoredStatus, changedAt }];
+
+  await ref.update({ status: restoredStatus, statusHistory });
+  return { ...order, status: restoredStatus, statusHistory };
+}
+
+/** Only ever reachable once an order is cancelled — enforced here too, not just hidden in the UI, since Server Actions are directly callable. */
+export async function deleteOrder(id: string): Promise<void> {
+  const ref = adminDb.collection("orders").doc(id);
+  const snap = await ref.get();
+  if (!snap.exists) return;
+  const order = snap.data() as Order;
+  if (order.status !== "cancelled") {
+    throw new Error("Only a cancelled order can be deleted.");
+  }
+  await ref.delete();
 }

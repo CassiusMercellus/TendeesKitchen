@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import * as store from "./store";
 import type { FulfillmentType, OrderLineItem, Unit } from "./types";
 
@@ -50,6 +51,24 @@ export async function revertOrderStatusAction(orderId: string) {
   await store.revertOrderStatus(orderId);
   revalidatePath(`/admin/orders/${orderId}`);
   revalidatePath("/admin/orders");
+}
+
+export async function cancelOrderAction(orderId: string) {
+  await store.cancelOrder(orderId);
+  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath("/admin/orders");
+}
+
+export async function reinstateOrderAction(orderId: string) {
+  await store.reinstateOrder(orderId);
+  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath("/admin/orders");
+}
+
+export async function deleteOrderAction(orderId: string) {
+  await store.deleteOrder(orderId);
+  revalidatePath("/admin/orders");
+  redirect("/admin/orders");
 }
 
 export async function toggleMenuItemAvailabilityAction(itemId: string) {
