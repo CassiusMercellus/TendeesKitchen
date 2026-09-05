@@ -26,6 +26,12 @@ export const metadata: Metadata = {
   description: "Nigerian & West African catering — order online, no phone call required.",
 };
 
+// Every page reads live Firestore data (menu, orders, settings), edited at
+// any time through the admin panel. Force dynamic rendering everywhere so
+// nothing gets statically baked in at build time and served stale until the
+// next deploy.
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${fraunces.variable} ${workSans.variable} ${plexMono.variable}`}>

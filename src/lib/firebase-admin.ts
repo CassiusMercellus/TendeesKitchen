@@ -1,9 +1,14 @@
 import "server-only";
-import { cert, getApps, initializeApp } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
-import { getAuth } from "firebase-admin/auth";
+import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
+import { getFirestore, type Firestore } from "firebase-admin/firestore";
+import { getAuth, type Auth } from "firebase-admin/auth";
 
-function getAdminApp() {
+// Lazy on purpose: Next.js evaluates route/layout modules during its build-time
+// "collect page data" step, before any real request and before env vars are
+// necessarily available. Credentials should only be required when something
+// actually touches Firestore/Auth at request time, not at module load.
+
+function getAdminApp(): App {
   const existing = getApps();
   if (existing.length) return existing[0];
 
@@ -22,7 +27,29 @@ function getAdminApp() {
   });
 }
 
-const app = getAdminApp();
+let firestoreInstance: Firestore | undefined;
+let authInstance: Auth | undefined;
 
-export const adminDb = getFirestore(app);
-export const adminAuth = getAuth(app);
+function getAdminDb(): Firestore {
+  if (!firestoreInstance) firestoreInstance = getFirestore(getAdminApp());
+  return firestoreInstance;
+}
+
+function getAdminAuth(): Auth {
+  if (!authInstance) authInstance = getAuth(getAdminApp());
+  return authInstance;
+}
+
+/** Forwards every property access to the real instance, created on first use. */
+function lazyProxy<T extends object>(resolve: () => T): T {
+  return new Proxy({} as T, {
+    get(_target, prop) {
+      const instance = resolve();
+      const value = Reflect.get(instance as object, prop, instance);
+      return typeof value === "function" ? value.bind(instance) : value;
+    },
+  });
+}
+
+export const adminDb = lazyProxy(getAdminDb);
+export const adminAuth = lazyProxy(getAdminAuth);
