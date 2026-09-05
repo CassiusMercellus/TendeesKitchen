@@ -1,10 +1,7 @@
 import "server-only";
-import fs from "node:fs";
-import path from "node:path";
-import { seedDb } from "./seed";
+import { adminDb } from "./firebase-admin";
 import { STAGES } from "./types";
 import type {
-  Db,
   MenuCategory,
   MenuItem,
   Order,
@@ -14,69 +11,53 @@ import type {
   Settings,
 } from "./types";
 
-const DB_PATH = path.join(process.cwd(), "data", "db.json");
-
-function readDb(): Db {
-  if (!fs.existsSync(DB_PATH)) {
-    const fresh = seedDb();
-    writeDb(fresh);
-    return fresh;
-  }
-  return JSON.parse(fs.readFileSync(DB_PATH, "utf-8")) as Db;
-}
-
-function writeDb(db: Db) {
-  fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
-}
-
-function nextId(prefix: string) {
-  return `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
-}
+const SETTINGS_DOC_ID = "global";
 
 // ---- settings ----
 
-export function getSettings(): Settings {
-  return readDb().settings;
+export async function getSettings(): Promise<Settings> {
+  const snap = await adminDb.collection("settings").doc(SETTINGS_DOC_ID).get();
+  if (!snap.exists) {
+    throw new Error("Settings document is missing — run the Firestore seed script.");
+  }
+  return snap.data() as Settings;
 }
 
 // ---- menu ----
 
-export function getCategories(): MenuCategory[] {
-  return [...readDb().categories].sort((a, b) => a.sortOrder - b.sortOrder);
+export async function getCategories(): Promise<MenuCategory[]> {
+  const snap = await adminDb.collection("menuCategories").orderBy("sortOrder").get();
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as MenuCategory);
 }
 
-export function getMenuItems(): MenuItem[] {
-  return readDb().items;
+export async function getMenuItems(): Promise<MenuItem[]> {
+  const snap = await adminDb.collection("menuItems").get();
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as MenuItem);
 }
 
-export function getMenuItemsByCategory(categoryId: string): MenuItem[] {
-  return readDb().items.filter((i) => i.categoryId === categoryId);
+export async function getAvailableMenuItems(): Promise<MenuItem[]> {
+  const snap = await adminDb.collection("menuItems").where("available", "==", true).get();
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as MenuItem);
 }
 
-export function getAvailableMenuItems(): MenuItem[] {
-  return readDb().items.filter((i) => i.available);
+export async function toggleMenuItemAvailability(itemId: string) {
+  const ref = adminDb.collection("menuItems").doc(itemId);
+  const snap = await ref.get();
+  if (!snap.exists) return;
+  const current = snap.data() as MenuItem;
+  await ref.update({ available: !current.available });
 }
 
-export function toggleMenuItemAvailability(itemId: string) {
-  const db = readDb();
-  const item = db.items.find((i) => i.id === itemId);
-  if (!item) return;
-  item.available = !item.available;
-  writeDb(db);
-}
-
-export function addMenuItem(input: {
+export async function addMenuItem(input: {
   categoryId: string;
   name: string;
   description: string;
   price: number;
   unit: MenuItem["unit"];
   photoUrl?: string;
-}) {
-  const db = readDb();
-  const item: MenuItem = {
-    id: nextId("item"),
+}): Promise<MenuItem> {
+  const ref = adminDb.collection("menuItems").doc();
+  const data = {
     categoryId: input.categoryId,
     name: input.name,
     description: input.description,
@@ -85,15 +66,15 @@ export function addMenuItem(input: {
     photoUrl: input.photoUrl,
     available: true,
   };
-  db.items.push(item);
-  writeDb(db);
-  return item;
+  await ref.set(data);
+  return { id: ref.id, ...data };
 }
 
 // ---- orders ----
 
-export function getOrders(): Order[] {
-  const orders = readDb().orders;
+export async function getOrders(): Promise<Order[]> {
+  const snap = await adminDb.collection("orders").get();
+  const orders = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Order);
   const active = orders
     .filter((o) => o.status !== "completed")
     .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
@@ -103,11 +84,13 @@ export function getOrders(): Order[] {
   return [...active, ...completed];
 }
 
-export function getOrder(id: string): Order | undefined {
-  return readDb().orders.find((o) => o.id === id);
+export async function getOrder(id: string): Promise<Order | undefined> {
+  const snap = await adminDb.collection("orders").doc(id).get();
+  if (!snap.exists) return undefined;
+  return { id: snap.id, ...snap.data() } as Order;
 }
 
-export function createOrder(input: {
+export async function createOrder(input: {
   customerName: string;
   customerPhone: string;
   customerEmail: string;
@@ -118,11 +101,10 @@ export function createOrder(input: {
   deliveryAddress?: string;
   notes?: string;
   items: OrderLineItem[];
-}): Order {
-  const db = readDb();
+}): Promise<Order> {
+  const ref = adminDb.collection("orders").doc();
   const now = new Date().toISOString();
-  const order: Order = {
-    id: nextId("order"),
+  const data = {
     customerName: input.customerName,
     customerPhone: input.customerPhone,
     customerEmail: input.customerEmail,
@@ -133,25 +115,28 @@ export function createOrder(input: {
     deliveryAddress: input.deliveryAddress,
     items: input.items,
     notes: input.notes,
-    status: "requested",
-    paymentStatus: "arranged_via_venmo",
+    status: "requested" as const,
+    paymentStatus: "arranged_via_venmo" as const,
     createdAt: now,
-    statusHistory: [{ status: "requested", changedAt: now }],
+    statusHistory: [{ status: "requested" as const, changedAt: now }],
   };
-  db.orders.push(order);
-  writeDb(db);
-  return order;
+  await ref.set(data);
+  return { id: ref.id, ...data };
 }
 
-export function advanceOrderStatus(id: string): Order | undefined {
-  const db = readDb();
-  const order = db.orders.find((o) => o.id === id);
-  if (!order) return undefined;
+export async function advanceOrderStatus(id: string): Promise<Order | undefined> {
+  const ref = adminDb.collection("orders").doc(id);
+  const snap = await ref.get();
+  if (!snap.exists) return undefined;
+  const order = { id: snap.id, ...snap.data() } as Order;
+
   const currentIndex = STAGES.findIndex((s) => s.key === order.status);
   if (currentIndex === -1 || currentIndex >= STAGES.length - 1) return order;
+
   const nextStatus: OrderStatus = STAGES[currentIndex + 1].key;
-  order.status = nextStatus;
-  order.statusHistory.push({ status: nextStatus, changedAt: new Date().toISOString() });
-  writeDb(db);
-  return order;
+  const changedAt = new Date().toISOString();
+  const statusHistory = [...order.statusHistory, { status: nextStatus, changedAt }];
+
+  await ref.update({ status: nextStatus, statusHistory });
+  return { ...order, status: nextStatus, statusHistory };
 }

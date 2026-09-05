@@ -15,9 +15,9 @@ function UtensilsIcon() {
   );
 }
 
-export default function LandingPage() {
-  const settings = getSettings();
-  const items = getAvailableMenuItems();
+export default async function LandingPage() {
+  const settings = await getSettings();
+  const items = await getAvailableMenuItems();
   const highlights = HIGHLIGHT_IDS.map((id) => items.find((i) => i.id === id)).filter((i): i is NonNullable<typeof i> => Boolean(i));
   const phoneDigits = settings.businessPhone.replace(/[^\d+]/g, "");
 

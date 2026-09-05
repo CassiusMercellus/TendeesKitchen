@@ -7,7 +7,7 @@ import { STAGES, UNIT_LABEL } from "@/lib/types";
 
 export default async function AdminOrderDetailPage(props: PageProps<"/admin/orders/[id]">) {
   const { id } = await props.params;
-  const order = getOrder(id);
+  const order = await getOrder(id);
   if (!order) notFound();
 
   const currentIndex = STAGES.findIndex((s) => s.key === order.status);

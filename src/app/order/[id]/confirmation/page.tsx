@@ -4,8 +4,8 @@ import { formatMoney, formatEventDate } from "@/lib/format";
 
 export default async function OrderConfirmationPage(props: PageProps<"/order/[id]/confirmation">) {
   const { id } = await props.params;
-  const order = getOrder(id);
-  const settings = getSettings();
+  const order = await getOrder(id);
+  const settings = await getSettings();
 
   if (!order) notFound();
 

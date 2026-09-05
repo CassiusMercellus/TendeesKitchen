@@ -2,8 +2,8 @@ import Link from "next/link";
 import { OrderForm } from "@/components/order-form";
 import { getSettings } from "@/lib/store";
 
-export default function OrderPage() {
-  const settings = getSettings();
+export default async function OrderPage() {
+  const settings = await getSettings();
 
   return (
     <div>

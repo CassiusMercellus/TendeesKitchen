@@ -18,7 +18,7 @@ export interface CreateOrderInput {
 }
 
 export async function createOrderAction(input: CreateOrderInput) {
-  const settings = store.getSettings();
+  const settings = await store.getSettings();
 
   if (!input.customerName.trim() || !input.customerPhone.trim()) {
     throw new Error("Name and phone are required.");
@@ -35,19 +35,19 @@ export async function createOrderAction(input: CreateOrderInput) {
     throw new Error("A delivery address is required for delivery orders.");
   }
 
-  const order = store.createOrder(input);
+  const order = await store.createOrder(input);
   revalidatePath("/admin/orders");
   return { id: order.id };
 }
 
 export async function advanceOrderStatusAction(orderId: string) {
-  store.advanceOrderStatus(orderId);
+  await store.advanceOrderStatus(orderId);
   revalidatePath(`/admin/orders/${orderId}`);
   revalidatePath("/admin/orders");
 }
 
 export async function toggleMenuItemAvailabilityAction(itemId: string) {
-  store.toggleMenuItemAvailability(itemId);
+  await store.toggleMenuItemAvailability(itemId);
   revalidatePath("/admin/menu");
   revalidatePath("/");
 }
@@ -64,7 +64,7 @@ export async function addMenuItemAction(formData: FormData) {
     throw new Error("Item name, category, and a valid price are required.");
   }
 
-  store.addMenuItem({ categoryId, name, description, price, unit, photoUrl });
+  await store.addMenuItem({ categoryId, name, description, price, unit, photoUrl });
   revalidatePath("/admin/menu");
   revalidatePath("/");
 }

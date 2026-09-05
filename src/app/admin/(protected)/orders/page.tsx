@@ -1,8 +1,8 @@
 import { OrdersDashboard } from "@/components/orders-dashboard";
 import { getOrders } from "@/lib/store";
 
-export default function AdminOrdersPage() {
-  const orders = getOrders();
+export default async function AdminOrdersPage() {
+  const orders = await getOrders();
 
   return (
     <div>

@@ -15,9 +15,9 @@ function UtensilsIcon() {
   );
 }
 
-export default function AdminMenuPage() {
-  const categories = getCategories();
-  const items = getMenuItems();
+export default async function AdminMenuPage() {
+  const categories = await getCategories();
+  const items = await getMenuItems();
 
   return (
     <div>
