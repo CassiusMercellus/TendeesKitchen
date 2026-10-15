@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Work_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Fraunces, Playfair_Display, Work_Sans, IBM_Plex_Mono } from "next/font/google";
 import { CartProvider } from "@/components/cart-provider";
 import "./globals.css";
 
@@ -7,6 +7,12 @@ const fraunces = Fraunces({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
   variable: "--font-fraunces",
+});
+
+const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["700", "800", "900"],
+  variable: "--font-playfair",
 });
 
 const workSans = Work_Sans({
@@ -34,7 +40,7 @@ export const dynamic = "force-dynamic";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${workSans.variable} ${plexMono.variable}`}>
+    <html lang="en" className={`${fraunces.variable} ${playfairDisplay.variable} ${workSans.variable} ${plexMono.variable}`}>
       <body className="min-h-screen bg-bg font-sans text-ink antialiased">
         <CartProvider>{children}</CartProvider>
       </body>

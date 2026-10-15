@@ -31,6 +31,23 @@
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
   --font-sans: var(--font-work-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  /* Rebrand palette — homepage only for now. See mockups/Home-Rebrand-Desktop-V2.dc.html. */
+  --color-brand-bg: #faf8f0;
+  --color-brand-surface-2: #f2efe2;
+  --color-brand-ink: #152117;
+  --color-brand-ink-soft: #4c5a4f;
+  --color-brand-green: #123a24;
+  --color-brand-green-deep: #061b10;
+  --color-brand-green-mid: #1d5c38;
+  --color-brand-green-tint: #e8f1ea;
+  --color-brand-gold: #c9993f;
+  --color-brand-gold-deep: #9c7324;
+  --color-brand-gold-tint: #f8ecd0;
+  --color-brand-gold-line: #dcb45c;
+  --color-brand-line: #e3dec7;
+
+  --font-playfair-display: var(--font-playfair), ui-serif, Georgia, serif;
 }
 
 body {
@@ -59,4 +76,109 @@ h1, h2, h3 {
       transparent 2px,
       transparent 18px
     );
+}
+
+/* ---------- Rebrand (homepage only) ---------- */
+
+.brand-silk {
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.1) 0%, transparent 18%, transparent 82%, rgba(255, 255, 255, 0.07) 100%),
+    linear-gradient(
+      150deg,
+      var(--color-brand-green-deep) 0%,
+      var(--color-brand-green) 45%,
+      var(--color-brand-green-mid) 58%,
+      var(--color-brand-green) 72%,
+      var(--color-brand-green-deep) 100%
+    );
+}
+
+.brand-trim-header {
+  height: 9px;
+  background-color: var(--color-brand-green-deep);
+  background-image: radial-gradient(circle, var(--color-brand-gold) 1.6px, transparent 1.7px);
+  background-size: 16px 9px;
+  background-position: 4px center;
+}
+
+.brand-trim {
+  height: 16px;
+  background-color: var(--color-brand-green-deep);
+  background-image: radial-gradient(circle, var(--color-brand-gold) 2.4px, transparent 2.5px);
+  background-size: 18px 16px;
+  background-position: 5px center;
+  border-top: 1px solid rgba(201, 153, 63, 0.4);
+  border-bottom: 1px solid rgba(201, 153, 63, 0.4);
+}
+
+.brand-trim.light {
+  background-color: var(--color-brand-gold-tint);
+  background-image: radial-gradient(circle, var(--color-brand-green-deep) 1.8px, transparent 1.9px);
+  opacity: 0.6;
+  border-top: 1px solid rgba(156, 115, 36, 0.25);
+  border-bottom: 1px solid rgba(156, 115, 36, 0.25);
+}
+
+.brand-logo-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border: 1.5px dashed rgba(220, 180, 92, 0.55);
+  border-radius: 50%;
+  color: var(--color-brand-gold-line);
+}
+.brand-logo-slot svg {
+  opacity: 0.85;
+}
+
+.brand-palm {
+  position: absolute;
+  pointer-events: none;
+}
+.brand-palm path {
+  fill: var(--color-brand-green-mid);
+}
+.brand-palm.on-light path {
+  fill: var(--color-brand-green);
+}
+
+.brand-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+.brand-divider .line {
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-brand-gold));
+}
+.brand-divider .line.r {
+  background: linear-gradient(270deg, transparent, var(--color-brand-gold));
+}
+.brand-divider .diamond {
+  width: 6px;
+  height: 6px;
+  background: var(--color-brand-gold);
+  transform: rotate(45deg);
+  flex: none;
+}
+
+.brand-trust-gold-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--color-brand-gold-deep),
+    var(--color-brand-gold) 25%,
+    var(--color-brand-gold-line) 50%,
+    var(--color-brand-gold) 75%,
+    var(--color-brand-gold-deep)
+  );
+  z-index: 1;
 }

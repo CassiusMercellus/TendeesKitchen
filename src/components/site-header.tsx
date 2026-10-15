@@ -2,9 +2,71 @@
 
 import Link from "next/link";
 import { useCart } from "@/components/cart-provider";
+import { BrandLogoSlot } from "@/components/brand-logo-slot";
 
-export function SiteHeader({ businessName }: { businessName: string }) {
+/**
+ * "green" is the Nigerian rebrand treatment (currently homepage-only — see
+ * mockups/Home-Rebrand-Desktop-V2.dc.html). Every other page keeps the
+ * original indigo header until the rest of the site is restyled.
+ */
+export function SiteHeader({
+  businessName,
+  variant = "indigo",
+}: {
+  businessName: string;
+  variant?: "indigo" | "green";
+}) {
   const { totalCount } = useCart();
+
+  if (variant === "green") {
+    return (
+      <header className="sticky top-0 z-20">
+        <div className="brand-silk">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-8">
+            <Link href="/" className="flex items-center gap-3">
+              <BrandLogoSlot size={34} />
+              <div>
+                <h1 className="font-playfair-display text-[19px] font-semibold text-white md:text-[22px]">
+                  {businessName}
+                </h1>
+                <p className="mt-0.5 font-mono text-[10px] tracking-wide text-brand-gold-line uppercase md:text-[10.5px]">
+                  Authentic Nigerian &amp; West African Cuisine
+                </p>
+              </div>
+            </Link>
+
+            <nav className="hidden items-center gap-7 md:flex">
+              <Link href="/#how-it-works" className="text-[14px] text-white/85 hover:text-white">
+                How it works
+              </Link>
+              <Link href="/menu" className="text-[14px] text-white/85 hover:text-white">
+                Menu
+              </Link>
+              <Link href="/#contact" className="text-[14px] text-white/85 hover:text-white">
+                Contact
+              </Link>
+              <Link
+                href="/menu"
+                className="rounded-full bg-gradient-to-b from-[#ddb15e] to-brand-gold px-4 py-2 text-[13.5px] font-semibold text-[#241705]"
+              >
+                Order Online
+              </Link>
+            </nav>
+
+            <Link
+              href="/order"
+              className="relative flex h-10 w-10 flex-none items-center justify-center rounded-full bg-white/10"
+              aria-label="View your order"
+            >
+              <CartIcon />
+              {totalCount > 0 && <CartBadge count={totalCount} variant="green" />}
+            </Link>
+          </div>
+        </div>
+        <div className="brand-trim-header" />
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-20 bg-indigo-deep text-white">
@@ -57,9 +119,13 @@ function CartIcon() {
   );
 }
 
-function CartBadge({ count }: { count: number }) {
+function CartBadge({ count, variant = "indigo" }: { count: number; variant?: "indigo" | "green" }) {
   return (
-    <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-gold px-1 font-mono text-[11px] font-bold text-[#1c1608]">
+    <span
+      className={`absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 font-mono text-[11px] font-bold ${
+        variant === "green" ? "bg-brand-gold text-[#241705]" : "bg-gold text-[#1c1608]"
+      }`}
+    >
       {count}
     </span>
   );
