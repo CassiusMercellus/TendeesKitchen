@@ -1,8 +1,8 @@
 import type { OrderStatus } from "@/lib/types";
 
 const STYLE: Record<OrderStatus, { label: string; fg: string; bg: string; strike?: boolean }> = {
-  requested: { label: "Requested", fg: "#2a3572", bg: "#e7e9f5" },
-  shopping: { label: "Shopping", fg: "#b9791a", bg: "#f6e8cf" },
+  requested: { label: "Requested", fg: "#061b10", bg: "#e8f1ea" },
+  shopping: { label: "Shopping", fg: "#9c7324", bg: "#f8ecd0" },
   prepping: { label: "Prepping", fg: "#a3321f", bg: "#f4e0da" },
   ready: { label: "Ready", fg: "#3f7d4f", bg: "#e3efe1" },
   out: { label: "Out / Pickup", fg: "#2c6e7a", bg: "#dcedf0" },

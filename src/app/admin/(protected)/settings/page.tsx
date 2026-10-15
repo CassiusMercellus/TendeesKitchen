@@ -40,7 +40,7 @@ export default async function AdminSettingsPage() {
           </div>
         </div>
 
-        <button type="submit" className="mt-4 w-full rounded-lg bg-indigo py-3 text-[13.5px] font-semibold text-white">
+        <button type="submit" className="mt-4 w-full rounded-lg bg-brand-green py-3 text-[13.5px] font-semibold text-white">
           Save settings
         </button>
       </form>

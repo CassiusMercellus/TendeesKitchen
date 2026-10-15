@@ -120,7 +120,7 @@ export default async function AdminOrderDetailPage(props: PageProps<"/admin/orde
                       done
                         ? "border-good bg-good"
                         : current
-                          ? "border-indigo bg-indigo"
+                          ? "border-brand-green bg-brand-green"
                           : "border-line-strong bg-surface"
                     }`}
                   >
@@ -146,7 +146,7 @@ export default async function AdminOrderDetailPage(props: PageProps<"/admin/orde
       {isCancelled ? (
         <section className="px-5 pt-5 pb-9 lg:px-0">
           <form action={reinstateThisOrder}>
-            <button type="submit" className="w-full rounded-xl bg-indigo py-4 text-[14.5px] font-semibold text-white">
+            <button type="submit" className="w-full rounded-xl bg-brand-green py-4 text-[14.5px] font-semibold text-white">
               Reinstate order
             </button>
           </form>
@@ -182,7 +182,7 @@ export default async function AdminOrderDetailPage(props: PageProps<"/admin/orde
                 type="submit"
                 disabled={atEnd}
                 className={`w-full rounded-xl py-4 text-[14.5px] font-semibold ${
-                  atEnd ? "bg-good-tint text-good" : "bg-indigo text-white"
+                  atEnd ? "bg-good-tint text-good" : "bg-brand-green text-white"
                 }`}
               >
                 {atEnd ? "Order completed" : `Advance to ${STAGES[currentIndex + 1].label}`}
@@ -219,7 +219,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function ContactRow({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2.5 border-b border-line py-2.5 text-[13px] text-ink-soft last:border-b-0">
-      <span className="flex-none text-indigo">{icon}</span>
+      <span className="flex-none text-brand-green">{icon}</span>
       {children}
     </div>
   );

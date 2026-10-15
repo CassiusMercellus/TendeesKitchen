@@ -29,7 +29,7 @@ export function MenuPhoto({ src, alt }: { src?: string; alt: string }) {
 
   if (!src || failed) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gold-tint to-indigo-tint text-indigo/55">
+      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-gold-tint to-brand-green-tint text-brand-green/55">
         <UtensilsIcon />
       </div>
     );

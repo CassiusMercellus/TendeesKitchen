@@ -16,8 +16,8 @@ export default async function AdminMenuPage() {
       </div>
 
       <div className="px-5 pt-3 md:px-8">
-        <details className="group max-w-2xl rounded-xl bg-indigo-tint open:pb-1">
-          <summary className="flex cursor-pointer list-none items-center gap-1.5 px-4 py-3 text-[13px] font-semibold text-indigo">
+        <details className="group max-w-2xl rounded-xl bg-brand-gold-tint open:pb-1">
+          <summary className="flex cursor-pointer list-none items-center gap-1.5 px-4 py-3 text-[13px] font-semibold text-brand-gold-deep">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" className="transition-transform group-open:rotate-45">
               <path d="M12 5v14M5 12h14" />
             </svg>
@@ -52,7 +52,7 @@ export default async function AdminMenuPage() {
                       <button
                         type="submit"
                         aria-label={item.available ? `Mark ${item.name} sold out` : `Mark ${item.name} available`}
-                        className={`relative h-6 w-10 flex-none rounded-full ${item.available ? "bg-indigo" : "bg-line-strong"}`}
+                        className={`relative h-6 w-10 flex-none rounded-full ${item.available ? "bg-brand-green" : "bg-line-strong"}`}
                       >
                         <span
                           className={`absolute top-[3px] h-[18px] w-[18px] rounded-full bg-white transition-all ${

@@ -25,7 +25,7 @@ export function OrdersDashboard({ orders }: { orders: Order[] }) {
             key={f.key}
             onClick={() => setFilter(f.key)}
             className={`flex-none rounded-full border px-3 py-1.5 text-[12.5px] font-medium whitespace-nowrap ${
-              filter === f.key ? "border-indigo bg-indigo text-white" : "border-line bg-surface text-ink-soft"
+              filter === f.key ? "border-brand-green bg-brand-green text-white" : "border-line bg-surface text-ink-soft"
             }`}
           >
             {f.label}
@@ -45,7 +45,7 @@ export function OrdersDashboard({ orders }: { orders: Order[] }) {
             >
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
-                  {order.status === "requested" && <span className="h-1.5 w-1.5 rounded-full bg-indigo" />}
+                  {order.status === "requested" && <span className="h-1.5 w-1.5 rounded-full bg-brand-green" />}
                   <span className="text-[14.5px] font-semibold">{order.customerName}</span>
                 </div>
                 <StatusPill status={order.status} />

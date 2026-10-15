@@ -26,34 +26,39 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
   await requireAdminSession();
 
   return (
-    <div className="mx-auto max-w-5xl">
-      <div className="sticky top-0 z-20 bg-indigo-deep px-5 pt-5 pb-3 text-white md:px-8">
-        <div className="flex items-center justify-between">
-          <span className="text-lg font-semibold">Kitchen Admin</span>
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-[12px] text-indigo-tint/80 underline">
-              View site
-            </Link>
-            <form action={logoutAction}>
-              <button type="submit" className="text-[12px] text-indigo-tint/80 underline">
-                Log out
-              </button>
-            </form>
+    <div className="min-h-screen bg-brand-bg text-brand-ink">
+      <div className="mx-auto max-w-5xl">
+        <div className="sticky top-0 z-20">
+          <div className="brand-silk px-5 pt-5 pb-3 text-white md:px-8">
+            <div className="flex items-center justify-between">
+              <span className="font-playfair-display text-lg font-semibold">Kitchen Admin</span>
+              <div className="flex items-center gap-4">
+                <Link href="/" className="text-[12px] text-brand-gold-line underline">
+                  View site
+                </Link>
+                <form action={logoutAction}>
+                  <button type="submit" className="text-[12px] text-brand-gold-line underline">
+                    Log out
+                  </button>
+                </form>
+              </div>
+            </div>
+            <nav className="mt-3 flex gap-4 text-[13px]">
+              <Link href="/admin/orders" className="border-b-2 border-transparent pb-2 text-white/90 hover:border-white/40">
+                Orders
+              </Link>
+              <Link href="/admin/menu" className="border-b-2 border-transparent pb-2 text-white/90 hover:border-white/40">
+                Menu
+              </Link>
+              <Link href="/admin/settings" className="border-b-2 border-transparent pb-2 text-white/90 hover:border-white/40">
+                Settings
+              </Link>
+            </nav>
           </div>
+          <div className="brand-trim-header" />
         </div>
-        <nav className="mt-3 flex gap-4 text-[13px]">
-          <Link href="/admin/orders" className="border-b-2 border-transparent pb-2 text-white/90 hover:border-white/40">
-            Orders
-          </Link>
-          <Link href="/admin/menu" className="border-b-2 border-transparent pb-2 text-white/90 hover:border-white/40">
-            Menu
-          </Link>
-          <Link href="/admin/settings" className="border-b-2 border-transparent pb-2 text-white/90 hover:border-white/40">
-            Settings
-          </Link>
-        </nav>
+        {children}
       </div>
-      {children}
     </div>
   );
 }

@@ -28,7 +28,7 @@ export function MenuBrowser({ categories, items }: { categories: MenuCategory[];
               onClick={() => setActive(cat.id)}
               className={`flex-none rounded-full border px-3.5 py-2 text-sm font-medium whitespace-nowrap ${
                 active === cat.id
-                  ? "border-indigo bg-indigo text-white"
+                  ? "border-brand-green bg-brand-green text-white"
                   : "border-line bg-surface text-ink-soft"
               }`}
             >
@@ -64,7 +64,7 @@ export function MenuBrowser({ categories, items }: { categories: MenuCategory[];
                         onClick={() => setQty(cartRef(item), qty - 1)}
                         disabled={qty === 0}
                         className={`flex h-7 w-7 items-center justify-center rounded-md border ${
-                          qty > 0 ? "border-indigo bg-indigo text-white" : "border-line-strong text-indigo"
+                          qty > 0 ? "border-brand-green bg-brand-green text-white" : "border-line-strong text-brand-green"
                         } disabled:opacity-40`}
                         aria-label={`Remove one ${item.name}`}
                       >
@@ -73,7 +73,7 @@ export function MenuBrowser({ categories, items }: { categories: MenuCategory[];
                       <span className="w-3.5 text-center font-mono text-[13px]">{qty}</span>
                       <button
                         onClick={() => setQty(cartRef(item), qty + 1)}
-                        className="flex h-7 w-7 items-center justify-center rounded-md border border-line-strong text-indigo"
+                        className="flex h-7 w-7 items-center justify-center rounded-md border border-line-strong text-brand-green"
                         aria-label={`Add one ${item.name}`}
                       >
                         +
@@ -92,7 +92,7 @@ export function MenuBrowser({ categories, items }: { categories: MenuCategory[];
         <div className="sticky bottom-0 bg-gradient-to-t from-bg from-60% to-transparent px-4 pt-4 pb-5 md:hidden">
           <Link
             href="/order"
-            className="flex items-center justify-between rounded-xl bg-indigo px-4 py-3.5 text-[14.5px] font-semibold text-white"
+            className="flex items-center justify-between rounded-xl bg-brand-green px-4 py-3.5 text-[14.5px] font-semibold text-white"
           >
             <span>View order · {totalCount} items</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -114,7 +114,7 @@ export function MenuBrowser({ categories, items }: { categories: MenuCategory[];
             </p>
             <Link
               href="/order"
-              className="mt-4 flex items-center justify-center rounded-lg bg-indigo py-3 text-[13.5px] font-semibold text-white"
+              className="mt-4 flex items-center justify-center rounded-lg bg-brand-green py-3 text-[13.5px] font-semibold text-white"
             >
               Review order
             </Link>

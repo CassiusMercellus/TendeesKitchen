@@ -95,7 +95,7 @@ export function AddItemForm({ categories }: { categories: MenuCategory[] }) {
             className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-[13px] placeholder:text-ink-faint/70"
           />
         </div>
-        <button type="submit" className="w-full rounded-lg bg-indigo py-2.5 text-[13.5px] font-semibold text-white">
+        <button type="submit" className="w-full rounded-lg bg-brand-green py-2.5 text-[13.5px] font-semibold text-white">
           Save item
         </button>
       </form>
@@ -115,9 +115,9 @@ export function AddItemForm({ categories }: { categories: MenuCategory[] }) {
                 <div className="font-mono text-[11px] text-ink-faint">{UNIT_LABEL[unit]}</div>
               </div>
               <div className="flex flex-none items-center gap-2.5 opacity-50">
-                <span className="flex h-7 w-7 items-center justify-center rounded-md border border-line-strong text-indigo">−</span>
+                <span className="flex h-7 w-7 items-center justify-center rounded-md border border-line-strong text-brand-green">−</span>
                 <span className="w-3.5 text-center font-mono text-[13px]">0</span>
-                <span className="flex h-7 w-7 items-center justify-center rounded-md border border-line-strong text-indigo">+</span>
+                <span className="flex h-7 w-7 items-center justify-center rounded-md border border-line-strong text-brand-green">+</span>
               </div>
             </div>
           </div>

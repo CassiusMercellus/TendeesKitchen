@@ -8,8 +8,8 @@ export default async function MenuPage() {
   const items = await getAvailableMenuItems();
 
   return (
-    <div>
-      <SiteHeader businessName={settings.businessName} />
+    <div className="bg-brand-bg text-brand-ink">
+      <SiteHeader businessName={settings.businessName} variant="green" />
       <MenuBrowser categories={categories} items={items} />
     </div>
   );
